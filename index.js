@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import _ from 'lodash';
 
+
 const { width } = Dimensions.get('window');
 
 type Props = {
@@ -158,7 +159,11 @@ class TagInput extends Component {
       return;
 
     const text = event.nativeEvent.text;
-    this.setState({ text: text });
+
+    this.setState({ text: text }, () => {
+    });
+
+
     const lastTyped = text.charAt(text.length - 1);
 
     const parseWhen = [',', ' ', ';'];
@@ -202,7 +207,7 @@ class TagInput extends Component {
     const tags = _.clone(this.props.value);
     tags.splice(index, 1);
     this.props.onChange(tags);
-    this.focus();
+    // this.focus();
   };
 
   _getLabelValue = (tag) => {
@@ -269,17 +274,14 @@ class TagInput extends Component {
         onLayout={this.measureWrapper}
         style={[styles.container]}>
         <View
-          style={[styles.wrapper,{height: wrapperHeight}]}
+          style={[styles.wrapper]}
           ref="wrapper"
           onLayout={this.measureWrapper}>
-          <ScrollView
-            ref='scrollView'
-            style={styles.tagInputContainerScroll}
-            onContentSizeChange={(w, h) => this.contentHeight = h}
-            onLayout={ev => this.scrollViewHeight = ev.nativeEvent.layout.height}
-          >
+          <View>
             <View style={styles.tagInputContainer}>
+            <View style={{ flexDirection : 'row', flexWrap : 'wrap', width : width }} >
               {value.map((tag, index) => this._renderTag(tag, index))}
+            </View>
               <View style={[styles.textInputContainer, { width: this.state.inputWidth }]}>
                 <TextInput
                   ref="tagInput"
@@ -293,10 +295,11 @@ class TagInput extends Component {
                 }]}
                   onChange={this.onChange}
                   onSubmitEditing={this.parseTags}
+                  onBlur={() => {this.setState({text: ''})}}
                 />
               </View>
             </View>
-          </ScrollView>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     )
@@ -318,20 +321,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tagInputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
   },
   textInput: {
-    height: 36,
+    height: 25,
     fontSize: 16,
     flex: .6,
     marginBottom: 6,
     padding: 0,
-
   },
   textInputContainer: {
-    height: 36,
   },
   tag: {
     justifyContent: 'center',
